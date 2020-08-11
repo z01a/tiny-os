@@ -1,0 +1,87 @@
+# Borland compiler base directory
+BCC_DIR = C:\BC31
+# Include directory for Borlan Compiler
+BCC_INCLUDE = $(BCC_DIR)\INCLUDE
+# Library directory for Borlan Compiler
+BCC_LIBRARY = $(BCC_DIR)\LIB
+
+# Kernel include direcory
+KERNEL_INCLUDE_DIR = H
+# Kernel source directory
+KERNEL_SOURCE_DIR = SRC
+# Kernel temporary directory for OBJ files
+KERNEL_OBJECT_DIR = OBJ
+# Kernel temporary directory for EXE file
+KERNEL_OUTPUT_DIR = BIN
+# Kernel temporary directory for ASM files
+KERNEL_ASM_DIR = ASM
+# Kernel library directory
+KERNEL_LIBRARY_DIR = LIB
+# User files and userMain entry point
+USER_DIR = USER
+
+# Kernel include paths used for compilation
+INCLUDE_PATH = $(BCC_INCLUDE);$(KERNEL_INCLUDE_DIR);$(USER_DIR)
+# Kernel library paths sed for compilation
+LIBRARY_PATH = $(BCC_LIBRARY);$(KERNEL_LIBRARY_DIR)
+
+# Borlan C++ Compiler
+BCC = BCC
+
+# Flags for compilation
+FLAGS = -v -mh -Od -V -Vb
+
+# Flags, Include and Lib paths
+OPTIONS = $(FLAGS) -I$(INCLUDE_PATH) -L$(LIBRARY_PATH) -n$(KERNEL_OUTPUT_DIR)
+
+# ALL SOURCES FILES
+SOURCES = $(KERNEL_SOURCE_DIR)\*.CPP $(USER_DIR)\*.CPP
+# ALL OBJECT FILES
+OBJECTS = $(KERNEL_OBJECT_DIR)\*.OBJ
+# ALL ASM FILES
+ASM = $(KERNEL_ASM_DIR)\*.ASM
+# ALL LIBRARIES
+LIBS = $(KERNEL_LIBRARY_DIR)\*.LIB
+
+# IS DEBUG ACTIVE
+DEBUG = -DDEBUG
+
+# OUTPUT FILE NAME
+KERNEL = KERNEL.EXE
+
+# SIZE OF BUFFER	
+BUFFER = 5
+# NUMBER OF PRODUCERS
+PRODUCERS = 3
+
+all: kernel
+
+directories: clean
+	@mkdir $(KERNEL_OUTPUT_DIR)
+	@mkdir $(KERNEL_OBJECT_DIR)
+	@mkdir $(KERNEL_ASM_DIR)
+	@echo Created project directories!
+
+kernel: directories objects
+	@$(BCC) $(OPTIONS) -e$(KERNEL) $(OBJECTS) $(LIBS)
+	
+objects: directories
+	@$(BCC) $(OPTIONS) $(DEBUG) -c -n$(KERNEL_OBJECT_DIR) $(SOURCES) $(LIBS)
+
+asm:
+	@$(BCC) $(OPTIONS) -S -n$(KERNEL_ASM_DIR) $(SOURCES) $(LIBS)
+
+run:
+	@echo Running Kernel!
+	@$(KERNEL_OUTPUT_DIR)\$(KERNEL) $(BUFFER) $(PRODUCERS)
+	@echo Kernel Finished!
+
+clean:
+	@del $(KERNEL_OUTPUT_DIR)\*.* > NUL
+	@del $(KERNEL_OBJECT_DIR)\*.* > NUL
+	@del $(KERNEL_ASM_DIR)\*.* > NUL
+	@rmdir $(KERNEL_OUTPUT_DIR) > NUL
+	@rmdir $(KERNEL_OBJECT_DIR) > NUL
+	@rmdir $(KERNEL_ASM_DIR) > NUL
+
+	@echo Deleted project directories!
